@@ -109,8 +109,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSensorChanged(SensorEvent event) {
             //Toast.makeText(MainActivity.this,"triggered!",Toast.LENGTH_SHORT).show();
-           playerView.getVideoSurfaceView().setRotationX(event.values[0]);
-           playerView.getVideoSurfaceView().setRotationX(event.values[1]);
+           //playerView.getVideoSurfaceView().setRotationY(event.values[2]);
+           //playerView.getVideoSurfaceView().setRotationX(event.values[1]);
+           //playerView.setZ(event.values[0]);
+            //playerView.setRotationY(event.values[2]);
+            //playerView.setRotationX(event.values[1]);
+           
         }
 
         @Override
