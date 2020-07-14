@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });*/
 
-        final OrientationEventListener orientationEventListener=new OrientationEventListener(this,SensorManager.SENSOR_STATUS_ACCURACY_HIGH) {
+        final OrientationEventListener orientationEventListener=new OrientationEventListener(this,0) {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onOrientationChanged( int orientation) {
@@ -136,15 +136,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     //RotateAnimation rotate = new RotateAnimation(-oldDegrees, -oldDegrees+20, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                     //rotate.setDuration(5000);
 
-                    RotateAnimation rotateAnimation = new RotateAnimation(-(oldDegrees),-(orientation),
+                    /*RotateAnimation rotateAnimation = new RotateAnimation(-(oldDegrees),-(orientation),
                             Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    rotateAnimation.setInterpolator(new LinearInterpolator());
-                    rotateAnimation.setDuration(100);
-                    //rotateAnimation.setRepeatCount(0);
-                    rotateAnimation.setFillAfter(true);
-                    playerView.getVideoSurfaceView().startAnimation(rotateAnimation);
-                    oldDegrees=orientation;
+                    rotateAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+                    rotateAnimation.setDuration(0);
+                    rotateAnimation.setRepeatCount(0);
+                    rotateAnimation.setFillAfter(true);*/
+                    //playerView.getVideoSurfaceView().startAnimation(rotateAnimation);
+                    //playerView.getVideoSurfaceView().animate().rotationBy(-(orientation-oldDegrees)).setDuration(10).setInterpolator(new LinearInterpolator()).start();
 
+                    ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(playerView.getVideoSurfaceView() ,
+                            "rotation", -oldDegrees, -orientation);
+                    objectAnimator.setDuration(100);
+                    objectAnimator.start();
+                    oldDegrees=orientation;
                     //playerView.getVideoSurfaceView().animate().rotationBy((orientation-oldDegrees)).setDuration(100).start();
                     /*if(-orientation>-oldDegrees){
                         playerView.getVideoSurfaceView().animate().rotation(360).setInterpolator(new ReverseInterpolator());
@@ -180,7 +185,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }else if(canRotate && Math.abs(orientation-oldDegrees)>10){
                     //playerView.getVideoSurfaceView().animate().rotationBy()
                     //problem around 0 degree point
-                    oldDegrees=orientation;
+                    int temp=orientation;
+                    /*if(orientation==0){
+                        orientation=360;
+                    }else if(oldDegrees==0){
+                        oldDegrees=360;
+                    }
+                    ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(playerView.getVideoSurfaceView() ,
+                            "rotation", -oldDegrees, -orientation);
+                    objectAnimator.setDuration(100);
+                    objectAnimator.start();*/
+                    oldDegrees=temp;
                 }
 
             }
@@ -188,19 +203,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         orientationEventListener.enable();
 
 
-        mySensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-        List<Sensor> mySensors = mySensorManager.getSensorList(Sensor.TYPE_ORIENTATION);
 
-        if(mySensors.size() > 0){
-           // mySensorManager.registerListener(sensorEventListener, mySensors.get(0), SensorManager.SENSOR_DELAY_NORMAL);
-            sersorrunning = true;
-            Toast.makeText(this, "Start ORIENTATION Sensor", Toast.LENGTH_LONG).show();
-        }
-        else{
-            Toast.makeText(this, "No ORIENTATION Sensor", Toast.LENGTH_LONG).show();
-            sersorrunning = false;
-            finish();
-        }
         initializePlayer();
     }
 
@@ -277,29 +280,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float[] mGravity = new float[3];
-        float[] mGeomagnetic=new float[3];
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-            mGravity = event.values;
 
-        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-            mGeomagnetic = event.values;
-
-        if (mGravity != null && mGeomagnetic != null) {
-           // Toast.makeText(getApplicationContext(),"triggered!",Toast.LENGTH_SHORT).show();
-            float R[] = new float[9];
-            float I[] = new float[9];
-
-            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
-            if (success) {
-                float orientation[] = new float[3];
-                SensorManager.getOrientation(R, orientation);
-                float azimuth = orientation[0]; // orientation contains: azimuth, pitch and roll
-                float pitch = orientation[1];
-                float roll = orientation[2];
-                getWindow().getDecorView().setRotation(roll);
-            }
-        }
     }
 
     @Override
